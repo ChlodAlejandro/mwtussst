@@ -8,7 +8,7 @@ module.exports = {
     // The rate at which this script will test sandbox usage. We highly, HIGHLY suggest, that
     // you first check the transclusion count before setting this to `1` (100% of pages) or
     // any value that might account for a large amount of transclusions.
-    rate: 0.1,
+    rate: 0.01,
 
     // The number of threads to use. Doesn't mean actual threads, but determines the maximum
     // number of concurrent parse requests.
@@ -24,6 +24,7 @@ module.exports = {
     // If set to an array, pages with this category will immediately fail if they are in this
     // category after the sandbox template is tested.
     failOnCategories: [ 
-        "Pages with script errors" 
+        "Pages with script errors" ,
+        "Pages with split article errors"
     ]
 };

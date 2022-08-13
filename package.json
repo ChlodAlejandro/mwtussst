@@ -1,6 +1,32 @@
 {
-  "dependencies": {
-    "axios": "^0.27.2",
-    "chalk": "^4.1.2"
-  }
+    "name": "mwtussst",
+    "description": "Tests template sandboxes by sampling template usages on MediaWiki wikis.",
+    "version": "1.0.0",
+    "main": "test.js",
+    "devDependencies": {},
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ChlodAlejandro/mwtussst.git"
+    },
+    "keywords": [
+        "wikimedia",
+        "mediawiki",
+        "template",
+        "sample",
+        "test",
+        "substitution"
+    ],
+    "author": "Chlod Alejandro <chlod@chlod.net>",
+    "license": "Apache-2.0",
+    "bugs": {
+        "url": "https://github.com/ChlodAlejandro/mwtussst/issues"
+    },
+    "homepage": "https://github.com/ChlodAlejandro/mwtussst#readme",
+    "scripts": {
+        "start": "node test.js"
+    },
+    "dependencies": {
+        "axios": "^0.27.2",
+        "chalk": "^4.1.2"
+    }
 }
