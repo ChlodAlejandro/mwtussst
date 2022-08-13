@@ -8,6 +8,11 @@ Written in a few hours. Don't expect it to be *good* good.
 ## Usage
 Edit `config.js`. Documentation is provided. Run `npm run start` after.
 
+## To-do
+* Support redirects
+* Better documentation
+* Better log output
+
 ## License
 ```
 Copyright 2022 Chlod Aidan Alejandro

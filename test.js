@@ -1,9 +1,14 @@
+const OPERATOR = "User:Chlod; wiki@chlod.net";
+
+// ========================================================
+
 const axios = require('axios');
 const chalk = require('chalk');
 const crypto = require('crypto');
 
 const Queue = require('./queue');
 const config = require('./config');
+const packageInfo = require('./package-lock.json');
 
 // https://stackoverflow.com/a/9310752/6011166
 function escapeRegExp(text) {
@@ -16,11 +21,60 @@ function sha1(text) {
     return shasum.digest('hex');
 }
 
+axios.defaults.headers.common['User-Agent'] = `mwtussst/${
+    packageInfo.version
+} (${OPERATOR}) axios/${
+    packageInfo.packages["node_modules/axios"].version
+}`;
+
 (async () => {
     console.log(`${chalk.blueBright("[info]")} Starting test...`);
-    console.log(`${chalk.blueBright("[info]")} Getting transclusions of "${config.template}"...`);
-    
+
     const normalizedTitle = "Template:" + config.template[0].toUpperCase() + config.template.slice(1);
+
+    // Get template redirects
+    console.log(`${chalk.blueBright("[info]")} Getting redirects of "${normalizedTitle}"...`);
+    const requestData = (await axios.post(config.api, new URLSearchParams({
+        format: 'json',
+        formatversion: 2,
+        action: 'query',
+        prop: 'linkshere',
+        titles: normalizedTitle,
+        lhprop: 'title',
+        lhnamespace: 10, // Template:
+        lhshow: 'redirect',
+        lhlimit: 'max'
+    }), {
+        responsetype: "json"
+    } )).data;
+    const aliases = [
+        normalizedTitle.replace(/^\s*Template:/g, ""),
+         ...requestData.query.pages[0].linkshere.map(
+            v => v.title.replace(/^\s*Template:/g, "")
+        )
+    ];
+    console.log(`${chalk.blueBright("[info]")} Found redirects:`);
+    aliases.forEach(v => {
+        console.log(`${chalk.blueBright("[info]")} * Template:${v}`);
+    })
+
+    const aliasesRegexString = `(?:${
+        aliases.map((v) => {
+            if (/[A-Za-z]/.test(v[0])) {
+                return `[${
+                    v[0].toUpperCase()
+                }${
+                    v[0].toLowerCase()
+                }]${
+                    escapeRegExp(v.slice(1)).replace(/\\[ _]/g, "[ _]")
+                }`;
+            } else {
+                return escapeRegExp(v.slice(1)).replace(/\\[ _]/g, "[ _]");
+            }
+        }).join("|")
+    })`;
+
+    console.log(`${chalk.blueBright("[info]")} Getting transclusions of "${config.template}"...`);   
 
     const foundPages = [];
     let eicontinue;
@@ -106,25 +160,13 @@ function sha1(text) {
             });
             const origWikitext = wikitext.slice(0);
 
-            let regexTemplate = config.template.trim();
-            if (/[A-Za-z]/.test(regexTemplate[0])) {
-                regexTemplate = `[${
-                    regexTemplate[0].toUpperCase()
-                }${
-                    regexTemplate[0].toLowerCase()
-                }]${
-                    escapeRegExp(regexTemplate.slice(1))
-                }`;
-            } else {
-                regexTemplate = escapeRegExp(regexTemplate.slice(1));
-            }
             const replacer = new RegExp(
-                "\\{\\{\\s*(?:\\:?[Tt]emplate:)?(" + regexTemplate + ")\\s*[|}]", "g"
+                "\\{\\{\\s*(?:\\:?[Tt]emplate:)?(" + aliasesRegexString + ")\\s*[|}]", "g"
             );
 
             wikitext = wikitext.replace(new RegExp(
                 replacer.source, replacer.flags
-            ), "{{$1/sandbox|");
+            ), `{{${config.template}/sandbox|`);
 
             return await axios.post(config.api, new URLSearchParams({
                 format: "json",
@@ -148,7 +190,7 @@ function sha1(text) {
                     page
                 };
             }).then(({ categories, templates }) => {
-                let status = "semi-fail";
+                let status = "semifail";
                 let info = null;
 
                 const failingCats = [];
@@ -213,6 +255,16 @@ function sha1(text) {
                     page
                 };
             });
+        }).then(r => {
+            console.log(`${
+                {
+                    error: chalk.red("[err!]"),
+                    fail: chalk.redBright("[fail]"),
+                    semifail: chalk.yellowBright("[smfl]"),
+                    pass: chalk.greenBright("[pass]"),
+                }[r.error ? "error" : r.status]
+            } ${page}${r.status === "fail" ? ": " + r.info : ""}`);
+            return r;
         }));
     }
 
@@ -222,7 +274,7 @@ function sha1(text) {
     const counts = {
         err: results.filter(v => v.error).length,
         fail: results.filter(v => v.status === "fail").length,
-        semifail: results.filter(v => v.status === "semi-fail").length,
+        semifail: results.filter(v => v.status === "semifail").length,
         pass: results.filter(v => v.status === "pass").length
     }
 
@@ -235,7 +287,7 @@ function sha1(text) {
     } failed`);
     console.log(`${chalk.blueBright("[info]")} ${
         counts.semifail
-    } semi-failed`);
+    } semifailed`);
     console.log(`${chalk.blueBright("[info]")} ${
         counts.pass
     } passed`);
