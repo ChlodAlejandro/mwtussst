@@ -1,7 +1,7 @@
 # MediaWiki Template Usage Sample Sandbox Substitution Tester
 Tests template sandboxes by sampling template usages on MediaWiki wikis. Uses categories to determine successes and failures. Tests on a sample of real template usages, which can catch unexpected edge cases or usages.
 
-Created after I got [scolded by Primefac](https://en.wikipedia.org/w/index.php?diff=1104066591) for breaking a template. I wasn't able to find any tool that allowed me to check if I introduce widespread errors with a template change. Thus, this tool was made. This hopefully prevents the "change it and see what breaks" process that usually comes with template changes.
+Created after I got (rightly) [scolded by Primefac](https://en.wikipedia.org/w/index.php?diff=1104066591) for breaking a template. I wasn't able to find any tool that allowed me to check if I introduce widespread errors with a template change. Thus, this tool was made. This hopefully prevents the "change it and see what breaks" process that usually comes with template changes.
 
 Written in a few hours. Don't expect it to be *good* good.
 
