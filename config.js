@@ -3,12 +3,12 @@ module.exports = {
     api: "https://en.wikipedia.org/w/api.php",
 
     // The template to test. This must have a valid /sandbox subpage.
-    template: "Split article",
+    template: "Backwards copy",
 
     // The rate at which this script will test sandbox usage. We highly, HIGHLY suggest, that
     // you first check the transclusion count before setting this to `1` (100% of pages) or
     // any value that might account for a large amount of transclusions.
-    rate: 0.1,
+    rate: 0.2,
 
     // The number of threads to use. Doesn't mean actual threads, but determines the maximum
     // number of concurrent parse requests.
@@ -19,12 +19,14 @@ module.exports = {
     
     // If set to an array, pages with this category will be marked as passing. If not found,
     // but not failing either (see failOnCategories), it will be a semi-pass.
-    succeedOnCategories: false,
+    succeedOnCategories: [
+        "Wikipedia article talk pages incorporating the backwardscopy template"
+    ],
     
     // If set to an array, pages with this category will immediately fail if they are in this
     // category after the sandbox template is tested.
     failOnCategories: [ 
         "Pages with script errors" ,
-        "Pages with split article errors"
+        "Pages with backwards copy errors"
     ]
 };

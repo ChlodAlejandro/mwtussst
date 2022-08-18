@@ -161,12 +161,12 @@ axios.defaults.headers.common['User-Agent'] = `mwtussst/${
             const origWikitext = wikitext.slice(0);
 
             const replacer = new RegExp(
-                "\\{\\{\\s*(?:\\:?[Tt]emplate:)?(" + aliasesRegexString + ")\\s*[|}]", "g"
+                "\\{\\{\\s*(?:\\:?[Tt]emplate:)?(" + aliasesRegexString + ")\\s*([|}])", "g"
             );
 
             wikitext = wikitext.replace(new RegExp(
                 replacer.source, replacer.flags
-            ), `{{${config.template}/sandbox|`);
+            ), `{{${config.template}/sandbox$2`);
 
             return await axios.post(config.api, new URLSearchParams({
                 format: "json",
@@ -217,7 +217,7 @@ axios.defaults.headers.common['User-Agent'] = `mwtussst/${
                     if (Array.isArray(config.succeedOnCategories)) {
                         status = config.succeedOnCategories.every(successCat => {
                             const successCatDb = successCat.replace(/ /g, "_");
-                            return categories.some(c => c === successCatDb)
+                            return categories.some(c => c.category === successCatDb);
                         }) ? "pass" : status;
                     } else {
                         status = "pass";
